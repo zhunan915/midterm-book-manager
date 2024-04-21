@@ -22,7 +22,7 @@ This is a simple online book management project built using Express and Node.js 
 - CRUD operations for managing books: add, update, delete, and view.
 - User-friendly interface for easy book management.
 - Responsive design for desktop and mobile devices.
-- 
+  
 <a id="Setup-Instructions"></a>
 ## Setup Instructions
 
@@ -35,7 +35,7 @@ This is a simple online book management project built using Express and Node.js 
 
  2.Navigate to the project directory:
  ```bash
-  cd backend
+   cd backend
 ```
 ```bash
   cd frontend
