@@ -29,7 +29,7 @@ This is a simple online book management project built using Express and Node.js 
   1.Clone the repository:
 
 ```bash
-  git clone https://github.com/RadithSandeepa/simple-book-manager.git
+ git clone https://github.com/RadithSandeepa/simple-book-manager.git
 ```
 
 
@@ -44,8 +44,8 @@ This is a simple online book management project built using Express and Node.js 
   npm install
 ```
 ```bash
-  cd frontend
-  npm install
+ cd frontend
+ npm install
 ```
  4.Set up MySQL database:
  - Create a MySQL database for the project.
