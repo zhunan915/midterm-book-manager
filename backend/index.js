@@ -17,10 +17,6 @@ const db = mysql.createConnection({
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (req, res) => {
-    res.json("Welcome to our API!");
-})
-
 app.get("/books", (req, res) => {
     const query = "SELECT * FROM books";
     db.query(query, (err, result) => {
@@ -85,8 +81,6 @@ app.get("/books/:id", (req, res) => {
     })
 
 })
-
-
 
 app.listen(8800, () => {
     console.log("Backend server is running!");
