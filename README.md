@@ -45,3 +45,28 @@ This is a simple online book management project built using Express and Node.js 
  ```bash
   npm install
 ```
+ 4.Set up MySQL database:
+ - Create a MySQL database for the project.
+ - Copy the .env.example file and rename it to .env.
+ - Open the .env file and fill in the necessary data:
+```bash
+  DB_HOST=your_mysql_host
+  DB_USER=your_mysql_username
+  DB_PASSWORD=your_mysql_password
+  DB_DATABASE=your_database_name
+```
+Replace your_mysql_host, your_mysql_username, your_mysql_password, and your_database_name with your MySQL database connection details.
+
+ 5.Import the provided SQL file (book_manager.sql) into your MySQL database to create the necessary tables and data.
+
+ 6.Start the server:
+ ```bash
+  npm start
+```
+7.Open your preferred web browser and navigate to http://localhost:3000 to access the Simple Book Manager.
+
+
+
+
+
+
