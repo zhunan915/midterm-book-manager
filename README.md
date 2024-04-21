@@ -12,9 +12,9 @@ This is a simple online calculator project built using HTML, CSS, and JavaScript
 <a id="Screenshots"></a>
 ## Screenshots
 
-![Home]([https://github.com/RadithSandeepa/calculator/blob/main/Images/calculator.png](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/home.png))
-![Add]([https://github.com/RadithSandeepa/calculator/blob/main/Images/calculator.png](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/add.png))
-![Update]([https://github.com/RadithSandeepa/calculator/blob/main/Images/calculator.png](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/edit.png))
+![Home](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/home.png)
+![Add](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/add.png)
+![Update](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/edit.png)
 
 <a id="Features"></a>
 ## Features
