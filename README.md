@@ -1,7 +1,7 @@
 
-# Simple Calculator
+# Simple Book Manager
 
-This is a simple online calculator project built using HTML, CSS, and JavaScript.
+This is a simple online book management project built using Express and Node.js for the backend, React for the frontend, and MySQL for the database.
 ## Table of Contents
 
 - [Screenshots](#Screenshots)
@@ -19,21 +19,29 @@ This is a simple online calculator project built using HTML, CSS, and JavaScript
 <a id="Features"></a>
 ## Features
 
-- Basic arithmetic operations: addition, subtraction, multiplication, and division.
-- Decimal point functionality.
-- Clear and delete last character buttons.
+- CRUD operations for managing books: add, update, delete, and view.
+- User-friendly interface for easy book management.
 - Responsive design for desktop and mobile devices.
-
+- 
 <a id="Setup-Instructions"></a>
 ## Setup Instructions
 
   1.Clone the repository:
 
 ```bash
-  git clone https://github.com/RadithSandeepa/calculator.git
+  git clone https://github.com/RadithSandeepa/simple-book-manager.git
 ```
 
 
- 2.Open the index.html file in your preferred web browser.
+ 2.Navigate to the project directory:
+ ```bash
+  cd backend
+```
+```bash
+  cd frontend
+```
 
- 3.Enter numbers and perform calculations using the provided  buttons.
+ 3.Install dependencies:
+ ```bash
+  npm install
+```
