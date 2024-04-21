@@ -35,14 +35,16 @@ This is a simple online book management project built using Express and Node.js 
 
  2.Navigate to the project directory:
  ```bash
-   cd backend
-```
-```bash
-  cd frontend
+  cd simple-book-manager
 ```
 
  3.Install dependencies:
  ```bash
+  cd backend
+  npm install
+```
+```bash
+  cd frontend
   npm install
 ```
  4.Set up MySQL database:
