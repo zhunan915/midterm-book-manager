@@ -13,7 +13,9 @@ This is a simple online book management project built using Express and Node.js 
 ## Screenshots
 
 ![Home](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/home.png)
+
 ![Add](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/add.png)
+
 ![Update](https://github.com/RadithSandeepa/simple-book-manager/blob/main/photos/edit.png)
 
 <a id="Features"></a>
