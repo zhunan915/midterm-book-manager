@@ -38,16 +38,16 @@ jobs:
           docker build -t frontend-test -f frontend/Dockerfile frontend
           docker run --rm frontend-test npm test
 
-      # 6. Build & Push Images to ECR
+      # 6. Build & Push Frontend & Backend
       - name: Build & Push Backend
         run: |
-          docker build -t ${{ secrets.AWS_ECR_URL }}/backend:latest -f backend/Dockerfile backend
-          docker push ${{ secrets.AWS_ECR_URL }}/backend:latest
+          docker build -t ${{ secrets.DOCKERHUB_REPO }}/backend:latest -f backend/Dockerfile backend
+          docker push ${{ secrets.DOCKERHUB_REPO }}/backend:latest
 
       - name: Build & Push Frontend
         run: |
-          docker build -t ${{ secrets.AWS_ECR_URL }}/frontend:latest -f frontend/Dockerfile frontend
-          docker push ${{ secrets.AWS_ECR_URL }}/frontend:latest
+          docker build -t ${{ secrets.DOCKERHUB_REPO }}/frontend:latest -f frontend/Dockerfile frontend
+          docker push ${{ secrets.DOCKERHUB_REPO }}/frontend:latest
 
       # 7. Create Temp EC2 for Integration Testing
       - name: Create Temp EC2
