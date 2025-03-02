@@ -101,21 +101,10 @@ jobs:
             docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
             docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
 
-            # Create docker-compose.yml
-            cat << 'COMPOSE' > docker-compose.yml
-            version: '3'
-            services:
-              backend:
-                image: ${{ secrets.AWS_ECR_URL }}/backend:latest
-                container_name: backend
-                ports:
-                  - "8800:8800"
-              frontend:
-                image: ${{ secrets.AWS_ECR_URL }}/frontend:latest
-                container_name: frontend
-                ports:
-                  - "80:80"
-            COMPOSE
+            sudo yum -y install git
+            git clone https://github.com/zhunan915/midterm-book-manager.git
+            cd midterm-book-manager
+            
 
             docker-compose up -d
             sleep 20  # wait for containers to start
@@ -155,12 +144,12 @@ jobs:
           echo "Temp EC2 terminated."
 
       # 11. If Integration Succeeds, Deploy to QA
-      - name: Deploy to QA
-        if: success()
-        run: |
-          ssh -o StrictHostKeyChecking=no -i temp_key.pem ec2-user@${{ secrets.QA_EC2_IP }} << 'EOF'
-            docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
-            docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
-            docker compose up -d
-          EOF
+      # - name: Deploy to QA
+      #   if: success()
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no -i temp_key.pem ec2-user@${{ secrets.QA_EC2_IP }} << 'EOF'
+      #       docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
+      #       docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
+      #       docker compose up -d
+      #     EOF
 
