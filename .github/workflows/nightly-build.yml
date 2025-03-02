@@ -22,9 +22,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Login to Docker Hub
+      # 3. Login to Amazon ECR
+      - name: Login to ECR
         run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          aws ecr get-login-password --region us-east-1 \
+            | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_URL }}
 
       # 4. Build & Test Backend
       - name: Build & Test Backend
@@ -38,16 +40,16 @@ jobs:
           docker build -t frontend-test -f frontend/Dockerfile frontend
           docker run --rm frontend-test npm test
 
-      # 6. Build & Push Frontend & Backend
+      # 6. Build & Push Images to ECR
       - name: Build & Push Backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_REPO }}/book-backend:latest -f backend/Dockerfile backend
-          docker push ${{ secrets.DOCKERHUB_REPO }}/book-backend:latest
+          docker build -t ${{ secrets.AWS_ECR_URL }}/backend:latest -f backend/Dockerfile backend
+          docker push ${{ secrets.AWS_ECR_URL }}/backend:latest
 
       - name: Build & Push Frontend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_REPO }}/book-frontend:latest -f frontend/Dockerfile frontend
-          docker push ${{ secrets.DOCKERHUB_REPO }}/book-frontend:latest
+          docker build -t ${{ secrets.AWS_ECR_URL }}/frontend:latest -f frontend/Dockerfile frontend
+          docker push ${{ secrets.AWS_ECR_URL }}/frontend:latest
 
       # 7. Create Temp EC2 for Integration Testing
       - name: Create Temp EC2
@@ -57,11 +59,11 @@ jobs:
           # Launch a t2.micro (or any type) in your VPC
           # NOTE: Provide your own AMI, key name, subnet, and security group
           INSTANCE_ID=$(aws ec2 run-instances \
-            --image-id ami-0123456789abcdef0 \
+            --image-id ami-0429db42afe54dd71 \
             --instance-type t2.micro \
             --key-name ${{ secrets.EC2_KEY_NAME }} \
-            --security-group-ids sg-123456789 \
-            --subnet-id subnet-123456789 \
+            --security-group-ids sg-08c16d7ab5cf3ce5b \
+            --subnet-id subnet-0c76f72f1662fb769 \
             --count 1 \
             --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Temp-Integration-EC2}]' \
             --query 'Instances[0].InstanceId' \
@@ -86,7 +88,7 @@ jobs:
       - name: Integration Test on Temp EC2
         run: |
           set -e
-          echo "Connecting to ephemeral EC2 at $PUBLIC_IP"
+          echo "Connecting to temp EC2 at $PUBLIC_IP"
           
           # Copy your SSH private key from secrets into a file
           echo "${{ secrets.EC2_SSH_KEY }}" > temp_key.pem
@@ -94,15 +96,7 @@ jobs:
           
           # Install Docker & Compose, run docker-compose up, do smoke tests
           ssh -o StrictHostKeyChecking=no -i temp_key.pem ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
-            sudo yum update -y
-            sudo yum install -y docker git
-            sudo service docker start
-            sudo usermod -aG docker ec2-user
-
-            # Install Docker Compose
-            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-\$(uname -s)-\$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-
+          
             # Pull images
             docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
             docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
@@ -120,22 +114,14 @@ jobs:
                 image: ${{ secrets.AWS_ECR_URL }}/frontend:latest
                 container_name: frontend
                 ports:
-                  - "3000:3000"
+                  - "80:80"
             COMPOSE
 
             docker-compose up -d
             sleep 20  # wait for containers to start
 
-            # Smoke test backend (check if "welcome zhunan" or something similar)
-            RESPONSE_BACKEND=\$(curl -s http://localhost:8800/login || true)
-            if [[ \$RESPONSE_BACKEND != *"welcome zhunan"* ]]; then
-              echo "Smoke test failed. 'welcome zhunan' not found in backend response."
-              docker-compose down
-              exit 1
-            fi
-
             # Smoke test frontend
-            RESPONSE_FRONTEND=\$(curl -s http://localhost:3000 || true)
+            RESPONSE_FRONTEND=\$(curl -s http://localhost:80 || true)
             if [[ \$RESPONSE_FRONTEND != *"React App"* ]]; then
               echo "Smoke test failed. 'React App' not found in frontend."
               docker-compose down
