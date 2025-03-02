@@ -1,0 +1,131 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Every day at 00:00 UTC
+  workflow_dispatch:
+
+jobs:
+  build-test-integration-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Configure AWS Credentials (for ECR)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # 3. Log in to Amazon ECR
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 \
+            | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_URL }}
+
+      # 4. Build & Test Backend
+      - name: Build & Test Backend
+        run: |
+          docker build -t backend-test -f backend/Dockerfile backend
+          # Run backend tests (example: Jest)
+          docker run --rm backend-test npm test
+
+      # 5. Build & Test Frontend
+      - name: Build & Test Frontend
+        run: |
+          docker build -t frontend-test -f frontend/Dockerfile frontend
+          # Run frontend tests (example: React Testing Library / Jest)
+          docker run --rm frontend-test npm test
+
+      # 6. Build & Push Backend Image to ECR
+      - name: Build and Push Backend
+        run: |
+          docker build -t ${{ secrets.AWS_ECR_URL }}/backend:latest -f backend/Dockerfile backend
+          docker push ${{ secrets.AWS_ECR_URL }}/backend:latest
+
+      # 7. Build & Push Frontend Image to ECR
+      - name: Build and Push Frontend
+        run: |
+          docker build -t ${{ secrets.AWS_ECR_URL }}/frontend:latest -f frontend/Dockerfile frontend
+          docker push ${{ secrets.AWS_ECR_URL }}/frontend:latest
+
+      # 8. Integration Test on TEMP EC2
+      - name: Integration Test on Temp EC2
+        run: |
+          # If anything fails, we want to fail this step
+          set -e
+
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.TEMP_EC2_IP }} << 'EOF'
+            # Pull images from ECR
+            docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
+            docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
+
+            # Create a docker-compose.yml on the fly
+            cat << 'COMPOSE' > docker-compose.yml
+            version: '3'
+            services:
+              backend:
+                image: ${{ secrets.AWS_ECR_URL }}/backend:latest
+                container_name: backend
+                ports:
+                  - "8800:8800"
+
+              frontend:
+                image: ${{ secrets.AWS_ECR_URL }}/frontend:latest
+                container_name: frontend
+                ports:
+                  - "3000:3000"
+            COMPOSE
+
+            # Start both containers
+            docker compose up -d
+            sleep 20  # wait for containers to start
+
+            # Smoke test the backend: check for "welcome zhunan" (example)
+            RESPONSE_BACKEND=$(curl -s http://localhost:8800/login || true)
+            if [[ $RESPONSE_BACKEND != *"welcome zhunan"* ]]; then
+              echo "Smoke test failed. 'welcome zhunan' not found in backend response."
+              docker compose down
+              exit 1
+            fi
+
+            # Smoke test the frontend
+            RESPONSE_FRONTEND=$(curl -s http://localhost:3000 || true)
+            if [[ $RESPONSE_FRONTEND != *"React App"* ]]; then
+              echo "Smoke test failed. Could not find 'React App' in frontend."
+              docker compose down
+              exit 1
+            fi
+
+            # All tests pass
+            docker compose down
+          EOF
+
+      # 9. Remove Images from ECR if Integration Fails
+      - name: Remove Images from ECR on Failure
+        if: failure()
+        run: |
+          echo "Integration test failed. Removing images from ECR..."
+          aws ecr batch-delete-image \
+            --repository-name backend \
+            --image-ids imageTag=latest || true
+          aws ecr batch-delete-image \
+            --repository-name frontend \
+            --image-ids imageTag=latest || true
+
+      # 10. Deploy to Production if Tests Succeed
+      - name: Deploy to Production
+        if: success()
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.PROD_EC2_IP }} << 'EOF'
+            docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
+            docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
+
+            # Use your production docker-compose file or do something similar
+            docker compose up -d
+          EOF
