@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "8800:8800"
+    environment:
+      # AWS RDS MySQL connection details
+      DB_HOST: ${DB_HOST}           # e.g., your-rds-endpoint.amazonaws.com
+      DB_USER: ${DB_USER}           # your RDS username
+      DB_PASSWORD: ${DB_PASSWORD}   # your RDS password
+      DB_DATABASE: ${DB_DATABASE}   # your RDS database name
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_BACKEND_URL: ${REACT_APP_BACKEND_URL}  # URL to access backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
