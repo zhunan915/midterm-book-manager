@@ -1,30 +1,61 @@
-version: '3.8'
-
 services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-container
+    hostname: db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=db", "--user=root", "--password=root"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     container_name: backend
     ports:
       - "8800:8800"
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
       # AWS RDS MySQL connection details
-      DB_HOST: ${DB_HOST}           # e.g., your-rds-endpoint.amazonaws.com
-      DB_USER: ${DB_USER}           # your RDS username
-      DB_PASSWORD: ${DB_PASSWORD}   # your RDS password
-      DB_DATABASE: ${DB_DATABASE}   # your RDS database name
+      # DB_HOST: ${DB_HOST}           # e.g., your-rds-endpoint.amazonaws.com
+      # DB_USER: ${DB_USER}           # your RDS username
+      # DB_PASSWORD: ${DB_PASSWORD}   # your RDS password
+      # DB_DATABASE: ${DB_DATABASE}   # your RDS database 
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=test
     networks:
       - app-network
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
     container_name: frontend
     ports:
-      - "3000:3000"
-    environment:
-      REACT_APP_BACKEND_URL: ${REACT_APP_BACKEND_URL}  # URL to access backend
+      - "80:80"
+    # environment:
+    #   REACT_APP_BACKEND_URL: "http://backend:8800"
+    depends_on:
+      backend:
+        condition: service_started
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+

@@ -12,15 +12,15 @@ describe("Add Page (Simple Test)", () => {
     expect(screen.getByText("Add New Book")).toBeInTheDocument();
   });
 
-  test("typing in the title field updates input value", () => {
+  test("typing in the title field updates its value", () => {
     render(
       <MemoryRouter>
         <Add />
       </MemoryRouter>
     );
-
     const titleInput = screen.getByPlaceholderText("title");
     fireEvent.change(titleInput, { target: { value: "My Simple Title" } });
     expect(titleInput.value).toBe("My Simple Title");
   });
 });
+
