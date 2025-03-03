@@ -129,10 +129,10 @@ jobs:
         run: |
           echo "QA deployment failed. Removing images from ECR..."
           aws ecr batch-delete-image \
-            --repository-name backend \
+            --repository-name book-app/backend \
             --image-ids imageTag=latest || true
           aws ecr batch-delete-image \
-            --repository-name frontend \
+            --repository-name book-app/frontend \
             --image-ids imageTag=latest || true
 
       # 10. Terminate Temp EC2
