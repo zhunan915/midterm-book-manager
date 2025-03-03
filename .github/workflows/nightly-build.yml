@@ -113,6 +113,7 @@ jobs:
 
             sudo docker ps
             sudo netstat -tnlp
+            curl http://localhost:80
 
             # Smoke test frontend
             RESPONSE_FRONTEND=$(curl -s http://localhost:80 || true)
