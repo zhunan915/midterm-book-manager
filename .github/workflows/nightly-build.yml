@@ -34,12 +34,14 @@ jobs:
         run: |
           docker build -t backend-test -f backend/Dockerfile backend
           docker run --rm backend-test npm test
+          q
 
       # 5. Build & Test Frontend
       - name: Build & Test Frontend
         run: |
           docker build -t frontend-test -f frontend/Dockerfile frontend
           docker run --rm frontend-test npm test
+          q
 
       # 6. Build & Push Images to ECR
       - name: Build & Push Backend
