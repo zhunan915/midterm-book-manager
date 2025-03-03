@@ -108,7 +108,7 @@ jobs:
             cd midterm-book-manager
             
 
-            docker-compose up -d
+            sudo docker-compose up -d
             sleep 20  # wait for containers to start
 
             # Smoke test frontend
