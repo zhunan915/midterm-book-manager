@@ -4,12 +4,19 @@ import cors from "cors"
 
 const app = express();
 
+// const db = mysql.createConnection({
+//     host: "db",
+//     user: "root",
+//     password: "root",
+//     database: "test"
+// })
+
 const db = mysql.createConnection({
-    host: "db",
-    user: "root",
-    password: "root",
-    database: "test"
-})
+  host: process.env.DB_HOST || "db",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "root",
+  database: process.env.DB_NAME || "test"
+});
 
 db.connect((err) => {
     if (err) {
