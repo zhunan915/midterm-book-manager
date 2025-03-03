@@ -1,4 +1,4 @@
-name: Nightly Build with Ephemeral EC2
+name: Nightly Build with Temp EC2
 
 on:
   schedule:
