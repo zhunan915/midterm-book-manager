@@ -154,6 +154,7 @@ jobs:
         if: success()
         run: |
           ssh -o StrictHostKeyChecking=no -i temp_key.pem ec2-user@${{ secrets.QA_EC2_IP }} << 'EOF'
+            aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_URL }}
             sudo docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
             sudo docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
             sudo docker compose down
