@@ -100,8 +100,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i temp_key.pem ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
           
             # Pull images
-            docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
-            docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
+            sudo docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
+            sudo docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
 
             sudo yum -y install git
             sudo git clone https://github.com/zhunan915/midterm-book-manager.git
