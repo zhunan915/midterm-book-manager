@@ -1,6 +1,5 @@
 # Frontend Dockerfile
-# FROM node:18-alpine
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
@@ -12,13 +11,16 @@ RUN npm install
 # Copy the rest of the files
 COPY . .
 
+# Run tests before building the app
+RUN npm test -- --run 
+
 # Build the React app for production
 RUN npm run build
 
 # Use Nginx to serve the frontend
 FROM nginx:stable-alpine
-# COPY --from=0 /app/dist /usr/share/nginx/html
-COPY --from=builder /app/dist /usr/share/nginx/html 
+COPY --from=0 /app/dist /usr/share/nginx/html
+# COPY --from=builder /app/dist /usr/share/nginx/html 
 
 # Expose the default Nginx port
 EXPOSE 80
