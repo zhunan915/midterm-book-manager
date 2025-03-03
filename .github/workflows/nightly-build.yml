@@ -111,6 +111,9 @@ jobs:
             sudo docker-compose up -d
             sleep 20  # wait for containers to start
 
+            sudo docker ps
+            sudo netstat -tnlp
+
             # Smoke test frontend
             RESPONSE_FRONTEND=$(curl -s http://localhost:80 || true)
             if [[ $RESPONSE_FRONTEND != *"React App"* ]]; then
