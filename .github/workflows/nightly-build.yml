@@ -150,12 +150,13 @@ jobs:
           echo "Temp EC2 terminated."
 
       # 11. If Integration Succeeds, Deploy to QA
-      # - name: Deploy to QA
-      #   if: success()
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no -i temp_key.pem ec2-user@${{ secrets.QA_EC2_IP }} << 'EOF'
-      #       docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
-      #       docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
-      #       docker compose up -d
-      #     EOF
+      - name: Deploy to QA
+        if: success()
+        run: |
+          ssh -o StrictHostKeyChecking=no -i temp_key.pem ec2-user@${{ secrets.QA_EC2_IP }} << 'EOF'
+            sudo docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
+            sudo docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
+            sudo docker compose down
+            sudo docker compose up -d
+          EOF
 
