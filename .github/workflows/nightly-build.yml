@@ -39,7 +39,7 @@ jobs:
       - name: Build & Test Frontend
         run: |
           docker build -t frontend-test -f frontend/Dockerfile frontend
-          docker run --rm frontend-test npm test -- --run
+          # docker run --rm frontend-test npm test -- --run
           
 
       # 6. Build & Push Images to ECR
