@@ -158,7 +158,7 @@ jobs:
             sudo docker pull ${{ secrets.AWS_ECR_URL }}/backend:latest
             sudo docker pull ${{ secrets.AWS_ECR_URL }}/frontend:latest
             cd /home/ec2-user/docker-compose
-            sudo docker compose down
-            sudo docker compose up -d
+            sudo docker-compose down
+            sudo docker-compose up -d
           EOF
 
