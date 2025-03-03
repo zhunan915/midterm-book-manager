@@ -112,8 +112,8 @@ jobs:
             sleep 20  # wait for containers to start
 
             # Smoke test frontend
-            RESPONSE_FRONTEND=\$(curl -s http://localhost:80 || true)
-            if [[ \$RESPONSE_FRONTEND != *"React App"* ]]; then
+            RESPONSE_FRONTEND=$(curl -s http://localhost:80 || true)
+            if [[ $RESPONSE_FRONTEND != *"React App"* ]]; then
               echo "Smoke test failed. 'React App' not found in frontend."
               docker-compose down
               exit 1
