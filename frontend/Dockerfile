@@ -1,5 +1,6 @@
 # Frontend Dockerfile
-FROM node:18-alpine
+# FROM node:18-alpine
+FROM node:18-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -16,7 +17,8 @@ RUN npm run build
 
 # Use Nginx to serve the frontend
 FROM nginx:stable-alpine
-COPY --from=0 /app/dist /usr/share/nginx/html
+# COPY --from=0 /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html 
 
 # Expose the default Nginx port
 EXPOSE 80
