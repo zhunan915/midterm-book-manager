@@ -38,7 +38,8 @@ jobs:
       # 5. Build & Test Frontend
       - name: Build & Test Frontend
         run: |
-          docker build -t frontend-test -f frontend/Dockerfile frontend
+          # docker build -t frontend-test -f frontend/Dockerfile frontend
+          docker build --target builder -t frontend-test -f frontend/Dockerfile frontend
           docker run --rm frontend-test npm test -- --run
           
 
