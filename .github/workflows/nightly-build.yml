@@ -115,12 +115,12 @@ jobs:
             RESPONSE_FRONTEND=$(curl -s http://localhost:80 || true)
             if [[ $RESPONSE_FRONTEND != *"React App"* ]]; then
               echo "Smoke test failed. 'React App' not found in frontend."
-              docker-compose down
+              sudo docker-compose down
               exit 1
             fi
 
             # All tests pass
-            docker-compose down
+            sudo docker-compose down
           EOF
 
       # 9. Remove Images from ECR if QA Fails
